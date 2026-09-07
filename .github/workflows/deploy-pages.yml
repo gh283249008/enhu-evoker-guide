@@ -29,6 +29,18 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Build static site
         run: npm run build
+      - name: Make asset URLs relative for project Pages site
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path('dist/client')
+          for path in root.rglob('*'):
+              if path.is_file() and path.suffix in {'.html', '.js', '.rsc', '.json'}:
+                  text = path.read_text(encoding='utf-8')
+                  text = text.replace('\"/_next/', '\"./_next/')
+                  text = text.replace("'/_next/", "'./_next/")
+                  path.write_text(text, encoding='utf-8')
+          PY
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
