@@ -1,0 +1,6 @@
+export type Section = {id:string;title:string;originalTitle?:string;markdown:string;extraMarkdown?:string;kind:string;runKey?:string;runLabel?:string;level?:number;pullId?:number;logUrl?:string;teachingProfile?:string;teachingType?:string;timing?:{startSeconds:number;endSeconds:number;durationSeconds:number};aliases?:string[]};
+export type Chapter = {id:string;number:number;title:string;shortTitle:string;part:string;description:string;sections:Section[];originalMarkdown?:string};
+export type Glossary = {name:string;description:string;source:{chapterId?:string;sectionId?:string}};
+export type IndexData = {meta:{version:string;season:string;sourceRevisionDate:string;counts:Record<string,number>};chapters:Chapter[];glossary:Glossary[];search:{chapter:number;section:string;title:string;text:string;runLabel:string}[]};
+export type Navigate = (chapter:number,section?:string)=>void;
+export type Exercise = {id:string;chapterNumber:number;sectionTitle:string;type:string;title:string;context:string;conditions:string[];prompt:string;choices:{id:string;label:string;explanation:string}[];correctIds:string[];orderedIds?:string[];takeaway:string;variant?:{condition:string;explanation:string};simulationConcept?:string;runKey?:string;pullId?:number};
