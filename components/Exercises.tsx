@@ -2,6 +2,7 @@
 
 import {useState} from 'react';
 import {partyNames, renamePartyText} from '../lib/party-names';
+import {InlineMarkdown} from './Markdown';
 import type {Exercise} from '../lib/types';
 
 export default function Exercises({items,onComplete}:{items:Exercise[];onComplete:()=>void}){
@@ -46,28 +47,28 @@ function ExerciseCard({exercise,onComplete}:{exercise:Exercise;onComplete:()=>vo
   return <div className="exercise-card">
     <p className="eyebrow">{({order:'手法排序',target:'选择救援目标',diagnose:'手法诊断',decision:'情景决策'} as Record<string,string>)[exercise.type]||'思考练习'} · 教学情景</p>
     <h3>{exercise.title}</h3>
-    <p>{partyText(exercise.context)}</p>
+    <p><InlineMarkdown text={partyText(exercise.context)}/></p>
     <details className="conditions" open>
       <summary>本题条件 · 先看清，再出手</summary>
-      <ul>{exercise.conditions.map((condition,index)=><li key={index}>{partyText(condition)}</li>)}</ul>
+      <ul>{exercise.conditions.map((condition,index)=><li key={index}><InlineMarkdown text={partyText(condition)}/></li>)}</ul>
     </details>
-    <h4>{partyText(exercise.prompt)}</h4>
+    <h4><InlineMarkdown text={partyText(exercise.prompt)}/></h4>
     {!ordering&&exercise.correctIds.length>1&&<small>本题需要选出多个动作。</small>}
     <div className="exercise-options">{(ordering?order:exercise.choices.map(choice=>choice.id)).map((id,index)=>{
       const choice=exercise.choices.find(item=>item.id===id)!;
       const label=partyText(choice.label);
       return ordering
-        ? <div className="order-option" key={id}><span>{index+1}</span><b>{label}</b><button aria-label={`上移${label}`} disabled={submitted||index===0} onClick={()=>move(index,-1)}>↑</button><button aria-label={`下移${label}`} disabled={submitted||index===order.length-1} onClick={()=>move(index,1)}>↓</button></div>
-        : <button key={id} disabled={submitted} aria-pressed={selected.includes(id)} className={`answer-option ${selected.includes(id)?'chosen':''} ${submitted&&exercise.correctIds.includes(id)?'correct':''}`} onClick={()=>toggle(id)}><span>{String.fromCharCode(65+index)}</span>{label}</button>;
+        ? <div className="order-option" key={id}><span>{index+1}</span><b><InlineMarkdown text={label}/></b><button aria-label={`上移${label}`} disabled={submitted||index===0} onClick={()=>move(index,-1)}>↑</button><button aria-label={`下移${label}`} disabled={submitted||index===order.length-1} onClick={()=>move(index,1)}>↓</button></div>
+        : <button key={id} disabled={submitted} aria-pressed={selected.includes(id)} className={`answer-option ${selected.includes(id)?'chosen':''} ${submitted&&exercise.correctIds.includes(id)?'correct':''}`} onClick={()=>toggle(id)}><span>{String.fromCharCode(65+index)}</span><InlineMarkdown text={label}/></button>;
     })}</div>
     {!submitted
       ? <button className="button primary" disabled={!ordering&&!selected.length} onClick={()=>{setSubmitted(true);onComplete()}}>提交我的判断 →</button>
       : <div className="exercise-feedback">
           <h4>{correct?'思路对了。现在看为什么。':'先别背答案，看看判断漏在了哪里。'}</h4>
           {ordering&&<p><b>参考顺序：</b>{(exercise.orderedIds||exercise.correctIds).map(id=>partyText(exercise.choices.find(choice=>choice.id===id)?.label||'')).join(' → ')}</p>}
-          {exercise.choices.map(choice=><p key={choice.id}><strong>{partyText(choice.label)}</strong><br/>{partyText(choice.explanation)}</p>)}
-          <blockquote>{partyText(exercise.takeaway)}</blockquote>
-          {exercise.variant&&<><button className="text-button" onClick={()=>setVariant(!variant)}>换一个条件，还能照抄吗？ {variant?'−':'+'}</button>{variant&&<p><b>{partyText(exercise.variant.condition)}</b><br/>{partyText(exercise.variant.explanation)}</p>}</>}
+          {exercise.choices.map(choice=><p key={choice.id}><strong><InlineMarkdown text={partyText(choice.label)}/></strong><br/><InlineMarkdown text={partyText(choice.explanation)}/></p>)}
+          <blockquote><InlineMarkdown text={partyText(exercise.takeaway)}/></blockquote>
+          {exercise.variant&&<><button className="text-button" onClick={()=>setVariant(!variant)}>换一个条件，还能照抄吗？ {variant?'−':'+'}</button>{variant&&<p><b><InlineMarkdown text={partyText(exercise.variant.condition)}/></b><br/><InlineMarkdown text={partyText(exercise.variant.explanation)}/></p>}</>}
           <button className="button ghost" onClick={()=>{setSubmitted(false);setSelected([]);setVariant(false)}}>重新判断</button>
         </div>}
   </div>;

@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import {ArrowDown,ArrowRight,Check,Eye,Flame,Layers,ShieldAlert,Target,Timer,TriangleAlert} from 'lucide-react';
 import type {Storyboard,LessonScene} from '../lib/storyboard';
+import {InlineMarkdown, default as Markdown} from './Markdown';
 
 const evidenceNames={recorded:'正文记录',inference:'条件判断',hypothesis:'假设教学',unknown:'证据缺口'};
 const stateNames={hit:'本次受伤',danger:'优先观察',covered:'已见覆盖',safe:'此时稳定',unknown:'不能确定'};
@@ -10,11 +11,11 @@ const icons={targets:Target,arrival:Timer,slots:Layers,spacing:Eye,dispel:Shield
 /** No invented health percentages, synthetic times, or inferred player coordinates. */
 export default function WaveVisual({lesson}:{lesson:Storyboard}){
  return <section className="field-lesson" aria-label="本节分镜讲解">
-  <header className="field-lesson-heading"><p className="eyebrow">拆开看 · 再连起来打</p><h2>{lesson.title}</h2><p>{lesson.verdict}</p></header>
+  <header className="field-lesson-heading"><p className="eyebrow">拆开看 · 再连起来打</p><h2>{lesson.title}</h2><p><InlineMarkdown text={lesson.verdict}/></p></header>
   <nav className="scene-index" aria-label="本节演示目录">{lesson.scenes.map((s,i)=><a key={i} href={`#${lesson.sectionId}-scene-${i+1}`} onClick={e=>{e.preventDefault();document.getElementById(`${lesson.sectionId}-scene-${i+1}`)?.scrollIntoView({behavior:'smooth',block:'start'})}}><span>{String(i+1).padStart(2,'0')}</span>{s.title}</a>)}</nav>
   {lesson.scenes.map((s,i)=><Scene key={i} scene={s} number={i+1} id={`${lesson.sectionId}-scene-${i+1}`}/>)}
-  <footer className="field-takeaway"><Check size={21}/><div><b>这波带走一个判断</b><p>{lesson.takeaway}</p></div></footer>
-  <p className="field-boundary"><Eye size={15}/>{lesson.boundary}</p>
+  <footer className="field-takeaway"><Check size={21}/><div><b>这波带走一个判断</b><p><InlineMarkdown text={lesson.takeaway}/></p></div></footer>
+  <p className="field-boundary"><Eye size={15}/><InlineMarkdown text={lesson.boundary}/></p>
  </section>
 }
 function Scene({scene:s,number,id}:{scene:LessonScene;number:number;id:string}){
@@ -22,11 +23,11 @@ function Scene({scene:s,number,id}:{scene:LessonScene;number:number;id:string}){
  const Icon=icons[s.visual.type as keyof typeof icons]||Target;
  return <article className={`lesson-scene scene-${s.visual.type}`} id={id}>
   <header className="lesson-scene-header"><span className="scene-number">{String(number).padStart(2,'0')}</span><div><div className="scene-meta"><span className={`evidence-tag ${s.evidence}`}>{evidenceNames[s.evidence]}</span>{s.at&&<time>{s.at}</time>}</div><h3>{s.title}</h3></div></header>
-  <p className="scene-focus"><Icon size={19}/>{s.focus}</p>
-  <div className="scene-explainer"><div className="scene-drawing"><SceneDrawing scene={s}/></div><div className="scene-mechanic"><small>先认清眼前发生什么</small><p>{s.mechanic}</p></div></div>
+  <p className="scene-focus"><Icon size={19}/><InlineMarkdown text={s.focus}/></p>
+  <div className="scene-explainer"><div className="scene-drawing"><SceneDrawing scene={s}/></div><div className="scene-mechanic"><small>先认清眼前发生什么</small><p><InlineMarkdown text={s.mechanic}/></p></div></div>
   <div className="scene-decision-switch" role="group" aria-label="比较处理方式"><button aria-pressed={!showMistake} onClick={()=>setShowMistake(false)}><Check size={16}/>我该怎样接</button><button aria-pressed={showMistake} onClick={()=>setShowMistake(true)}><TriangleAlert size={16}/>换一手会错在哪</button></div>
-  <div className={`scene-answer ${showMistake?'mistake':''}`} aria-live="polite"><b>{showMistake?'别把这一手学反了':'把下一键说具体'}</b><p>{showMistake?s.pitfall:s.action}</p><div className="scene-because"><span>为什么</span><p>{s.why}</p></div></div>
-  <details className="scene-evidence"><summary>核对这一幕的正文依据</summary><blockquote>{s.sourceQuote}</blockquote><p>“正文记录”仅表示项目资料有记载；判断和假设不是日志还原。</p></details>
+  <div className={`scene-answer ${showMistake?'mistake':''}`} aria-live="polite"><b>{showMistake?'别把这一手学反了':'把下一键说具体'}</b><p><InlineMarkdown text={showMistake?s.pitfall:s.action}/></p><div className="scene-because"><span>为什么</span><p><InlineMarkdown text={s.why}/></p></div></div>
+  <details className="scene-evidence"><summary>核对这一幕的正文依据</summary><blockquote><Markdown text={s.sourceQuote}/></blockquote><p>“正文记录”仅表示项目资料有记载；判断和假设不是日志还原。</p></details>
  </article>
 }
 function SceneDrawing({scene:s}:{scene:LessonScene}){

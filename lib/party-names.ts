@@ -35,7 +35,7 @@ export function partyNames(seed = 'default'): PartyNames {
   const hash = hashSeed(seed);
   const trio = DAMAGE_TRIOS[hash % DAMAGE_TRIOS.length];
   const tank = TANKS[Math.floor(hash / DAMAGE_TRIOS.length) % TANKS.length];
-  return [tank, '你·奶龙', ...trio];
+  return [tank, '你·奶龙', `甲·${trio[0]}`, `乙·${trio[1]}`, `丙·${trio[2]}`];
 }
 
 export function renamePartyText(text: string, names: PartyNames) {
@@ -45,7 +45,10 @@ export function renamePartyText(text: string, names: PartyNames) {
     .replaceAll('输出甲', names[2])
     .replaceAll('输出乙', names[3])
     .replaceAll('输出丙', names[4])
-    .replaceAll('坦克', names[0]);
+    .replaceAll('坦克', names[0])
+    .replace(/\\([*_`])/g,'$1')
+    .replace(/\*\*/g,'')
+    .replace(/__/g,'');
 }
 
 export const DEFAULT_PARTY_NAMES = partyNames();
