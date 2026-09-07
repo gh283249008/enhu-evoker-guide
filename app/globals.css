@@ -49,3 +49,4 @@ button{color:inherit}button:not(.button){background:transparent}button:disabled{
 @media(max-width:700px){.spatial-board .spatial-person{width:24px;height:24px}}
 
 .spatial-board:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.party-joke-note{font-size:10px!important;line-height:1.8!important;color:#d2bf8b!important;border-left:2px solid #b59b6080;padding-left:10px;margin:14px 0 2px}
